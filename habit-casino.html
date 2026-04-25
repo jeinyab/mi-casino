@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MI CASINO DE HÁBITOS</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Exo+2:wght@300;400;600;700&display=swap');
+
+  :root {
+    --gold: #FFD700;
+    --gold2: #FFA500;
+    --dark: #0a0a14;
+    --card: #12121f;
+    --card2: #1a1a2e;
+    --t1: #4ade80;
+    --t2: #60a5fa;
+    --t3: #c084fc;
+    --bonus: #FFD700;
+    --jackpot: #ff4d4d;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+    --glow: 0 0 20px rgba(255,215,0,0.3);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'Exo 2', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-image: radial-gradient(ellipse at 20% 0%, rgba(255,165,0,0.07) 0%, transparent 60%),
+                      radial-gradient(ellipse at 80% 100%, rgba(192,132,252,0.07) 0%, transparent 60%);
+  }
+
+  h1, h2, .label-font { font-family: 'Black Ops One', cursive; }
+
+  /* HEADER */
+  header {
+    text-align: center;
+    padding: 24px 16px 12px;
+    border-bottom: 1px solid rgba(255,215,0,0.15);
+    background: linear-gradient(180deg, rgba(255,215,0,0.05) 0%, transparent 100%);
+  }
+  header h1 {
+    font-size: clamp(1.4rem, 6vw, 2rem);
+    background: linear-gradient(135deg, var(--gold), var(--gold2), #fff8dc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 2px;
+  }
+  header p { color: var(--muted); font-size: 0.75rem; letter-spacing: 1px; margin-top: 4px; }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid rgba(255,215,0,0.1);
+    background: var(--card);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .tab {
+    flex: 1;
+    padding: 12px 4px;
+    font-size: 0.65rem;
+    font-family: 'Black Ops One', cursive;
+    letter-spacing: 0.5px;
+    text-align: center;
+    color: var(--muted);
+    cursor: pointer;
+    border: none;
+    background: none;
+    transition: all 0.2s;
+    border-bottom: 2px solid transparent;
+  }
+  .tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+  /* PANELS */
+  .panel { display: none; padding: 16px; }
+  .panel.active { display: block; }
+
+  /* WHEEL */
+  .wheel-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .wheel-container {
+    position: relative;
+    width: min(320px, 90vw);
+    height: min(320px, 90vw);
+    margin: 0 auto;
+  }
+
+  #wheel-canvas {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    box-shadow: 0 0 40px rgba(255,215,0,0.2), 0 0 80px rgba(255,165,0,0.1);
+  }
+
+  .wheel-pointer {
+    position: absolute;
+    top: 50%;
+    right: -8px;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 14px solid transparent;
+    border-bottom: 14px solid transparent;
+    border-right: 28px solid var(--gold);
+    filter: drop-shadow(0 0 6px var(--gold));
+    z-index: 10;
+  }
+
+  .wheel-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    width: 40px;
+    height: 40px;
+    background: var(--dark);
+    border-radius: 50%;
+    border: 3px solid var(--gold);
+    z-index: 10;
+    box-shadow: 0 0 10px var(--gold);
+  }
+
+  #result-display {
+    text-align: center;
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+  #result-label {
+    font-family: 'Black Ops One', cursive;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+  }
+  #result-desc { font-size: 0.8rem; color: var(--muted); max-width: 260px; text-align: center; }
+
+  .spin-btn {
+    background: linear-gradient(135deg, var(--gold2), var(--gold));
+    color: #0a0a00;
+    font-family: 'Black Ops One', cursive;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    border: none;
+    border-radius: 50px;
+    padding: 14px 48px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(255,165,0,0.4);
+    transition: all 0.15s;
+    width: 100%;
+    max-width: 280px;
+  }
+  .spin-btn:active { transform: scale(0.96); }
+  .spin-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* HABITS */
+  .habit-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .habit-card {
+    background: var(--card2);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 14px;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .habit-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .habit-card[data-habit="phd"]::before { background: linear-gradient(90deg, var(--t3), transparent); }
+  .habit-card[data-habit="meditate"]::before { background: linear-gradient(90deg, var(--t2), transparent); }
+  .habit-card[data-habit="clean"]::before { background: linear-gradient(90deg, var(--t1), transparent); }
+
+  .habit-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .habit-name { font-family: 'Black Ops One', cursive; font-size: 0.85rem; letter-spacing: 1px; }
+  .habit-icon { font-size: 1.4rem; }
+  .habit-streak { font-size: 0.7rem; color: var(--gold); font-weight: 600; }
+
+  /* PROGRESS BAR (JAR) */
+  .jar-label { font-size: 0.65rem; color: var(--muted); margin-bottom: 4px; display: flex; justify-content: space-between; }
+  .jar-bar { height: 8px; background: rgba(255,255,255,0.06); border-radius: 99px; overflow: hidden; margin-bottom: 10px; }
+  .jar-fill { height: 100%; border-radius: 99px; transition: width 0.5s ease; }
+  .habit-card[data-habit="phd"] .jar-fill { background: linear-gradient(90deg, #a855f7, #c084fc); }
+  .habit-card[data-habit="meditate"] .jar-fill { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+  .habit-card[data-habit="clean"] .jar-fill { background: linear-gradient(90deg, #22c55e, #4ade80); }
+
+  .habit-actions { display: flex; gap: 8px; }
+  .do-habit-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    font-family: 'Black Ops One', cursive;
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .do-habit-btn:active { transform: scale(0.96); }
+  .habit-card[data-habit="phd"] .do-habit-btn { background: rgba(168,85,247,0.2); color: var(--t3); border: 1px solid rgba(168,85,247,0.3); }
+  .habit-card[data-habit="meditate"] .do-habit-btn { background: rgba(59,130,246,0.2); color: var(--t2); border: 1px solid rgba(59,130,246,0.3); }
+  .habit-card[data-habit="clean"] .do-habit-btn { background: rgba(34,197,94,0.2); color: var(--t1); border: 1px solid rgba(34,197,94,0.3); }
+
+  .clips-display {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  .clip { 
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.15);
+    transition: all 0.2s;
+  }
+  .clip.filled { border-color: transparent; box-shadow: 0 0 6px currentColor; }
+
+  /* REWARDS TAB */
+  .reward-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .reward-card {
+    background: var(--card2);
+    border-radius: 12px;
+    padding: 14px;
+    border: 1px solid rgba(255,255,255,0.06);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .reward-tier {
+    font-size: 0.55rem;
+    font-family: 'Black Ops One', cursive;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+    padding: 2px 8px;
+    border-radius: 99px;
+    display: inline-block;
+  }
+  .tier-1 { background: rgba(74,222,128,0.15); color: var(--t1); }
+  .tier-2 { background: rgba(96,165,250,0.15); color: var(--t2); }
+  .tier-3 { background: rgba(192,132,252,0.15); color: var(--t3); }
+  .tier-bonus { background: rgba(255,215,0,0.15); color: var(--gold); }
+  .reward-icon { font-size: 2rem; margin: 8px 0; }
+  .reward-name { font-size: 0.75rem; font-weight: 600; }
+  .reward-desc { font-size: 0.65rem; color: var(--muted); margin-top: 3px; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 28px 24px;
+    width: 100%;
+    max-width: 340px;
+    border: 1px solid rgba(255,215,0,0.2);
+    text-align: center;
+    box-shadow: 0 0 60px rgba(0,0,0,0.8), var(--glow);
+    animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes popIn {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .modal-emoji { font-size: 3.5rem; margin-bottom: 12px; }
+  .modal h2 { font-size: 1.3rem; margin-bottom: 8px; }
+  .modal p { font-size: 0.8rem; color: var(--muted); margin-bottom: 20px; }
+  .modal-reward-badge {
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-family: 'Black Ops One', cursive;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    display: inline-block;
+  }
+  .modal-btn {
+    width: 100%;
+    padding: 13px;
+    border-radius: 12px;
+    border: none;
+    font-family: 'Black Ops One', cursive;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-bottom: 8px;
+  }
+  .modal-btn:active { transform: scale(0.97); }
+  .modal-btn.primary { background: linear-gradient(135deg, var(--gold2), var(--gold)); color: #000; }
+  .modal-btn.secondary { background: rgba(255,255,255,0.06); color: var(--muted); }
+
+  /* TIMER */
+  .timer-display {
+    font-family: 'Black Ops One', cursive;
+    font-size: 2.5rem;
+    color: var(--gold);
+    letter-spacing: 4px;
+    margin: 10px 0;
+  }
+  .timer-display.urgent { color: var(--jackpot); animation: pulse 0.5s infinite alternate; }
+  @keyframes pulse { from { opacity: 1; } to { opacity: 0.5; } }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-family: 'Black Ops One', cursive;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    opacity: 0.8;
+  }
+
+  /* CLIP SELECTOR */
+  .clip-selector {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 12px 0;
+  }
+  .clip-btn {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.2);
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    background: transparent;
+  }
+  .clip-btn.selected { border-color: white; transform: scale(1.2); box-shadow: 0 0 10px currentColor; }
+  .clip-btn.gold-clip { background: linear-gradient(135deg, #FFD700, #FFA500); border-color: #FFD700; }
+
+  /* CONFETTI */
+  .confetti-piece {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 9999;
+    animation: confettiFall linear forwards;
+  }
+  @keyframes confettiFall {
+    0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.65rem;
+    padding: 3px 8px;
+    border-radius: 99px;
+    font-weight: 600;
+    background: rgba(255,215,0,0.1);
+    color: var(--gold);
+    border: 1px solid rgba(255,215,0,0.2);
+  }
+
+  .info-box {
+    background: rgba(255,215,0,0.05);
+    border: 1px solid rgba(255,215,0,0.15);
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 0.75rem;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  .info-box strong { color: var(--text); }
+
+  /* STATS */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+  .stat-card {
+    background: var(--card2);
+    border-radius: 10px;
+    padding: 12px 8px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  .stat-num { font-family: 'Black Ops One', cursive; font-size: 1.4rem; color: var(--gold); }
+  .stat-label { font-size: 0.6rem; color: var(--muted); margin-top: 2px; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--dark); }
+  ::-webkit-scrollbar-thumb { background: rgba(255,215,0,0.2); border-radius: 2px; }
+
+  .neon-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,215,0,0.2), transparent);
+    margin: 16px 0;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎰 MI CASINO</h1>
+  <p>SISTEMA DE HÁBITOS · SLOT MACHINE METHOD</p>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('wheel')">🎡 RUEDA</button>
+  <button class="tab" onclick="switchTab('habits')">📋 HÁBITOS</button>
+  <button class="tab" onclick="switchTab('rewards')">🎁 PREMIOS</button>
+  <button class="tab" onclick="switchTab('stats')">📊 STATS</button>
+</div>
+
+<!-- WHEEL TAB -->
+<div id="tab-wheel" class="panel active">
+  <div class="wheel-section">
+    <div class="info-box">
+      <strong>Cómo jugar:</strong> Primero haz tu hábito → ve a "Hábitos" → presiona ✅ HECHO → luego regresa aquí y gira la rueda.
+    </div>
+
+    <div id="selected-habit-badge" style="text-align:center; margin-bottom: 4px;">
+      <span class="badge" id="active-habit-label">⚡ Selecciona un hábito primero</span>
+    </div>
+
+    <div class="wheel-container">
+      <canvas id="wheel-canvas" width="320" height="320"></canvas>
+      <div class="wheel-pointer"></div>
+      <div class="wheel-center"></div>
+    </div>
+
+    <div id="result-display">
+      <div id="result-label" style="color: var(--muted); font-size:1rem;">— — —</div>
+      <div id="result-desc">Gira la rueda para obtener tu premio</div>
+    </div>
+
+    <button class="spin-btn" id="spin-btn" onclick="spinWheel()">🎰 GIRAR</button>
+
+    <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:4px;">
+      <span style="font-size:0.65rem; color:var(--muted);">T1: 40%</span>
+      <span style="font-size:0.65rem; color:var(--muted);">T2: 30%</span>
+      <span style="font-size:0.65rem; color:var(--muted);">T3: 20%</span>
+      <span style="font-size:0.65rem; color:var(--gold);">BONUS: 8%</span>
+      <span style="font-size:0.65rem; color:var(--jackpot);">JACKPOT: 2%</span>
+    </div>
+  </div>
+</div>
+
+<!-- HABITS TAB -->
+<div id="tab-habits" class="panel">
+  <div class="habit-grid">
+
+    <!-- PhD -->
+    <div class="habit-card" data-habit="phd">
+      <div class="habit-header">
+        <div>
+          <div class="habit-name" style="color:var(--t3);">📚 PROYECTO PhD</div>
+          <div class="habit-streak" id="phd-streak">🔥 0 días seguidos</div>
+        </div>
+        <div class="habit-icon">🎓</div>
+      </div>
+      <div class="jar-label">
+        <span>Progreso (paperclips)</span>
+        <span id="phd-clips-label">0 / 50</span>
+      </div>
+      <div class="jar-bar"><div class="jar-fill" id="phd-jar" style="width:0%"></div></div>
+      <div class="jar-label">
+        <span style="font-size:0.6rem">Mini: artículo</span>
+        <span style="font-size:0.6rem">Mid: curso</span>
+        <span style="font-size:0.6rem">🌟 PhD aplicación</span>
+      </div>
+      <div class="neon-divider"></div>
+      <div class="clips-display" id="phd-clips-row"></div>
+      <div class="habit-actions">
+        <button class="do-habit-btn" onclick="habitDone('phd')">✅ HECHO — GIRAR</button>
+      </div>
+    </div>
+
+    <!-- Meditate -->
+    <div class="habit-card" data-habit="meditate">
+      <div class="habit-header">
+        <div>
+          <div class="habit-name" style="color:var(--t2);">🧘 MEDITACIÓN</div>
+          <div class="habit-streak" id="meditate-streak">🔥 0 días seguidos</div>
+        </div>
+        <div class="habit-icon">☮️</div>
+      </div>
+      <div class="jar-label">
+        <span>Progreso (paperclips)</span>
+        <span id="meditate-clips-label">0 / 30</span>
+      </div>
+      <div class="jar-bar"><div class="jar-fill" id="meditate-jar" style="width:0%"></div></div>
+      <div class="jar-label">
+        <span style="font-size:0.6rem">Mini: spa day</span>
+        <span style="font-size:0.6rem">Mid: retiro</span>
+        <span style="font-size:0.6rem">🌟 viaje</span>
+      </div>
+      <div class="neon-divider"></div>
+      <div class="clips-display" id="meditate-clips-row"></div>
+      <div class="habit-actions">
+        <button class="do-habit-btn" onclick="habitDone('meditate')">✅ HECHO — GIRAR</button>
+      </div>
+    </div>
+
+    <!-- Clean -->
+    <div class="habit-card" data-habit="clean">
+      <div class="habit-header">
+        <div>
+          <div class="habit-name" style="color:var(--t1);">🏠 ORDEN EN CASA</div>
+          <div class="habit-streak" id="clean-streak">🔥 0 días seguidos</div>
+        </div>
+        <div class="habit-icon">✨</div>
+      </div>
+      <div class="jar-label">
+        <span>Progreso (paperclips)</span>
+        <span id="clean-clips-label">0 / 20</span>
+      </div>
+      <div class="jar-bar"><div class="jar-fill" id="clean-jar" style="width:0%"></div></div>
+      <div class="jar-label">
+        <span style="font-size:0.6rem">Mini: cena especial</span>
+        <span style="font-size:0.6rem">Mid: ropa nueva</span>
+        <span style="font-size:0.6rem">🌟 fin de semana</span>
+      </div>
+      <div class="neon-divider"></div>
+      <div class="clips-display" id="clean-clips-row"></div>
+      <div class="habit-actions">
+        <button class="do-habit-btn" onclick="habitDone('clean')">✅ HECHO — GIRAR</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- REWARDS TAB -->
+<div id="tab-rewards" class="panel">
+  <p class="section-title">Tus premios configurados</p>
+  <div class="reward-grid">
+    <div class="reward-card">
+      <div class="reward-tier tier-1">TIER 1</div>
+      <div class="reward-icon">🍫</div>
+      <div class="reward-name">Dulce</div>
+      <div class="reward-desc">1 porción de tu dulce favorito</div>
+    </div>
+    <div class="reward-card">
+      <div class="reward-tier tier-1">TIER 1</div>
+      <div class="reward-icon">📱</div>
+      <div class="reward-name">Redes Sociales</div>
+      <div class="reward-desc">15 min de scroll — solo aquí</div>
+    </div>
+    <div class="reward-card">
+      <div class="reward-tier tier-2">TIER 2</div>
+      <div class="reward-icon">▶️</div>
+      <div class="reward-name">YouTube</div>
+      <div class="reward-desc">1 video completo de tu elección</div>
+    </div>
+    <div class="reward-card">
+      <div class="reward-tier tier-2">TIER 2</div>
+      <div class="reward-icon">🍰</div>
+      <div class="reward-name">Postre Especial</div>
+      <div class="reward-desc">Ese postre que guardas para ocasiones</div>
+    </div>
+    <div class="reward-card">
+      <div class="reward-tier tier-3">TIER 3</div>
+      <div class="reward-icon">📺</div>
+      <div class="reward-name">Maratón YouTube</div>
+      <div class="reward-desc">45 min de videos sin culpa</div>
+    </div>
+    <div class="reward-card">
+      <div class="reward-tier tier-3">TIER 3</div>
+      <div class="reward-icon">🛁</div>
+      <div class="reward-name">Tarde libre</div>
+      <div class="reward-desc">2h para ti — lo que quieras</div>
+    </div>
+    <div class="reward-card" style="grid-column: span 2;">
+      <div class="reward-tier tier-bonus">🎰 JACKPOT</div>
+      <div class="reward-icon">🏆</div>
+      <div class="reward-name">Gran Premio</div>
+      <div class="reward-desc">Día completo libre · cena especial · compra que quieras</div>
+    </div>
+  </div>
+  <div class="neon-divider"></div>
+  <div class="info-box">
+    <strong>La regla de oro:</strong> Redes sociales, YouTube y dulces <em>SÓLO</em> se disfrutan como premio. Si lo haces "naked" (sin ganarlo), el casino pierde poder. Sé estricta contigo misma — esa es la magia.
+  </div>
+</div>
+
+<!-- STATS TAB -->
+<div id="tab-stats" class="panel">
+  <p class="section-title">Tu progreso total</p>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-num" id="total-spins">0</div>
+      <div class="stat-label">GIROS TOTALES</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="total-habits">0</div>
+      <div class="stat-label">HÁBITOS HECHOS</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="total-jackpots">0</div>
+      <div class="stat-label">JACKPOTS 🎰</div>
+    </div>
+  </div>
+
+  <p class="section-title">Clips acumulados</p>
+  <div class="info-box">
+    Cada clip = 1 hábito completado.<br>
+    <strong>PhD:</strong> <span id="stat-phd">0</span> clips &nbsp;|&nbsp;
+    <strong>Meditación:</strong> <span id="stat-med">0</span> clips &nbsp;|&nbsp;
+    <strong>Casa:</strong> <span id="stat-clean">0</span> clips
+  </div>
+
+  <p class="section-title">Instrucciones — La regla de oro</p>
+  <div class="info-box">
+    1. Haz tu hábito primero.<br>
+    2. Ve a "Hábitos" → presiona ✅ HECHO.<br>
+    3. Regresa a "Rueda" y gira.<br>
+    4. Si cae en BONUS → aparece la rueda bonus con temporizador de 10 min.<br>
+    5. <strong>Las redes sociales, YouTube y dulces SÓLO como premio.</strong>
+  </div>
+
+  <button class="spin-btn" style="background: rgba(255,50,50,0.15); color: #ff6b6b; border: 1px solid rgba(255,50,50,0.2); box-shadow:none; margin-top:8px;" onclick="resetConfirm()">
+    🗑️ REINICIAR TODO
+  </button>
+</div>
+
+<!-- RESULT MODAL -->
+<div class="modal-overlay" id="result-modal">
+  <div class="modal">
+    <div class="modal-emoji" id="modal-emoji">🎉</div>
+    <h2 id="modal-title">¡Ganaste!</h2>
+    <p id="modal-subtitle">Tu premio de hoy:</p>
+    <div class="modal-reward-badge" id="modal-badge">—</div>
+    <button class="modal-btn primary" id="modal-primary-btn" onclick="closeModal()">🎊 ¡A DISFRUTAR!</button>
+    <button class="modal-btn secondary" id="modal-secondary-btn" onclick="closeModal()" style="display:none">Cerrar</button>
+  </div>
+</div>
+
+<!-- BONUS MODAL -->
+<div class="modal-overlay" id="bonus-modal">
+  <div class="modal">
+    <div class="modal-emoji">⚡</div>
+    <h2 style="color:var(--gold)">¡BONUS!</h2>
+    <p>¡Puedes ganar un clip extra! Tienes <strong>10 minutos</strong> para completar una parte del hábito.</p>
+    <div id="bonus-timer" class="timer-display">10:00</div>
+    <div id="bonus-result" style="font-size:0.9rem; color:var(--t3); font-weight:600; margin-bottom:12px;"></div>
+    <button class="modal-btn primary" id="bonus-spin-btn" onclick="spinBonusWheel()" style="display:none">🎡 Girar Rueda Bonus</button>
+    <button class="modal-btn secondary" onclick="closeBonusModal()">Saltar bonus</button>
+  </div>
+</div>
+
+<script>
+// =========== STATE ===========
+let state = {
+  habits: {
+    phd:      { clips: 0, total: 0, streak: 0, lastDate: null, maxClips: 50 },
+    meditate: { clips: 0, total: 0, streak: 0, lastDate: null, maxClips: 30 },
+    clean:    { clips: 0, total: 0, streak: 0, lastDate: null, maxClips: 20 }
+  },
+  totalSpins: 0,
+  totalHabits: 0,
+  totalJackpots: 0,
+  pendingHabit: null,
+};
+
+function loadState() {
+  try {
+    const s = localStorage.getItem('habitCasino');
+    if (s) state = JSON.parse(s);
+  } catch(e) {}
+}
+function saveState() {
+  try { localStorage.setItem('habitCasino', JSON.stringify(state)); } catch(e) {}
+}
+
+// =========== WHEEL ===========
+const SEGMENTS = [
+  { label: 'T1', color: '#1a3a2a', textColor: '#4ade80', prob: 40 },
+  { label: 'T1', color: '#1a3a2a', textColor: '#4ade80', prob: 0 },
+  { label: 'T1', color: '#1a3a2a', textColor: '#4ade80', prob: 0 },
+  { label: 'T1', color: '#1a3a2a', textColor: '#4ade80', prob: 0 },
+  { label: 'T2', color: '#1a2a3a', textColor: '#60a5fa', prob: 30 },
+  { label: 'T2', color: '#1a2a3a', textColor: '#60a5fa', prob: 0 },
+  { label: 'T2', color: '#1a2a3a', textColor: '#60a5fa', prob: 0 },
+  { label: 'T3', color: '#2a1a3a', textColor: '#c084fc', prob: 20 },
+  { label: 'T3', color: '#2a1a3a', textColor: '#c084fc', prob: 0 },
+  { label: 'T3', color: '#2a1a3a', textColor: '#c084fc', prob: 0 },
+  { label: 'BONUS', color: '#3a2a00', textColor: '#FFD700', prob: 8 },
+  { label: 'BONUS', color: '#3a2a00', textColor: '#FFD700', prob: 0 },
+  { label: '🎰', color: '#3a0a0a', textColor: '#ff4d4d', prob: 2 },
+];
+
+// Distribute segments evenly (equal arc, weighted random result)
+const SEG_COUNT = 13;
+const ARC = (2 * Math.PI) / SEG_COUNT;
+
+let wheelAngle = 0;
+let isSpinning = false;
+let animFrame = null;
+
+const canvas = document.getElementById('wheel-canvas');
+const ctx = canvas.getContext('2d');
+const SIZE = 320;
+const cx = SIZE / 2, cy = SIZE / 2, r = SIZE / 2 - 4;
+
+function drawWheel(angle) {
+  ctx.clearRect(0, 0, SIZE, SIZE);
+  for (let i = 0; i < SEG_COUNT; i++) {
+    const start = angle + i * ARC;
+    const end = start + ARC;
+    const seg = SEGMENTS[i];
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, start, end);
+    ctx.closePath();
+    ctx.fillStyle = seg.color;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Label
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(start + ARC / 2);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = seg.textColor;
+    ctx.font = `bold ${seg.label.length > 4 ? 9 : 11}px 'Black Ops One', cursive`;
+    ctx.fillText(seg.label, r - 10, 4);
+    ctx.restore();
+  }
+  // Outer ring
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, 2*Math.PI);
+  ctx.strokeStyle = 'rgba(255,215,0,0.3)';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+}
+
+drawWheel(0);
+
+function weightedRandom() {
+  const weights = [40,0,0,0, 30,0,0, 20,0,0, 8,0, 2];
+  const total = weights.reduce((a,b)=>a+b,0);
+  let r = Math.random() * total;
+  for (let i=0; i<weights.length; i++) {
+    r -= weights[i];
+    if (r <= 0) return i;
+  }
+  return 0;
+}
+
+function spinWheel() {
+  if (isSpinning) return;
+  if (!state.pendingHabit) {
+    alert('¡Primero haz un hábito! Ve a la pestaña "Hábitos".');
+    return;
+  }
+  isSpinning = true;
+  document.getElementById('spin-btn').disabled = true;
+  document.getElementById('result-label').textContent = '...';
+  document.getElementById('result-desc').textContent = '';
+
+  const targetSeg = weightedRandom();
+  // Target angle: pointer is at right (angle 0 = right), we want targetSeg to stop at pointer
+  const targetAngle = -(targetSeg * ARC + ARC/2) + Math.PI * (3 + Math.random() * 2 * 6);
+  const startAngle = wheelAngle;
+  const totalRotation = (Math.PI * 2 * (5 + Math.random() * 3)) + targetAngle - startAngle;
+  const duration = 3500 + Math.random() * 1000;
+  let start = null;
+
+  function easeOut(t) { return 1 - Math.pow(1-t, 4); }
+
+  function animate(ts) {
+    if (!start) start = ts;
+    const elapsed = ts - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const currentAngle = startAngle + totalRotation * easeOut(progress);
+    wheelAngle = currentAngle;
+    drawWheel(currentAngle);
+    if (progress < 1) {
+      animFrame = requestAnimationFrame(animate);
+    } else {
+      isSpinning = false;
+      document.getElementById('spin-btn').disabled = false;
+      resolveResult(SEGMENTS[targetSeg].label);
+    }
+  }
+  requestAnimationFrame(animate);
+}
+
+function resolveResult(label) {
+  state.totalSpins++;
+  const habit = state.pendingHabit;
+  state.pendingHabit = null;
+  document.getElementById('active-habit-label').textContent = '⚡ Selecciona un hábito primero';
+
+  if (label === 'T1') showReward('T1', habit);
+  else if (label === 'T2') showReward('T2', habit);
+  else if (label === 'T3') showReward('T3', habit);
+  else if (label === 'BONUS') startBonus(habit);
+  else if (label === '🎰') showJackpot();
+
+  saveState();
+  updateUI();
+}
+
+const rewards = {
+  T1: { emoji:'🍫', title:'¡TIER 1!', reward:'Dulce o 15 min de Redes Sociales', color:'rgba(74,222,128,0.2)', border:'rgba(74,222,128,0.4)' },
+  T2: { emoji:'▶️', title:'¡TIER 2!', reward:'1 video de YouTube', color:'rgba(96,165,250,0.2)', border:'rgba(96,165,250,0.4)' },
+  T3: { emoji:'🛁', title:'¡TIER 3!', reward:'Tarde libre o Maratón YouTube 45 min', color:'rgba(192,132,252,0.2)', border:'rgba(192,132,252,0.4)' },
+};
+
+function showReward(tier, habit) {
+  const r = rewards[tier];
+  document.getElementById('result-label').textContent = tier;
+  document.getElementById('result-label').style.color = tier==='T1'?'var(--t1)':tier==='T2'?'var(--t2)':'var(--t3)';
+  document.getElementById('result-desc').textContent = r.reward;
+
+  document.getElementById('modal-emoji').textContent = r.emoji;
+  document.getElementById('modal-title').textContent = r.title;
+  document.getElementById('modal-subtitle').textContent = 'Tu premio de hoy:';
+  const badge = document.getElementById('modal-badge');
+  badge.textContent = r.reward;
+  badge.style.background = r.color;
+  badge.style.border = `1px solid ${r.border}`;
+  badge.style.color = tier==='T1'?'var(--t1)':tier==='T2'?'var(--t2)':'var(--t3)';
+  document.getElementById('modal-primary-btn').style.display = 'block';
+  document.getElementById('result-modal').classList.add('open');
+  if (tier !== 'T1') confetti();
+}
+
+function showJackpot() {
+  state.totalJackpots++;
+  document.getElementById('result-label').textContent = '🎰 JACKPOT';
+  document.getElementById('result-label').style.color = 'var(--jackpot)';
+  document.getElementById('result-desc').textContent = '¡Día libre completo!';
+  document.getElementById('modal-emoji').textContent = '🏆';
+  document.getElementById('modal-title').textContent = '¡¡JACKPOT!!';
+  document.getElementById('modal-subtitle').textContent = '¡El premio máximo!';
+  const badge = document.getElementById('modal-badge');
+  badge.textContent = '🎊 Día completo libre + Lo que quieras 🎊';
+  badge.style.background = 'rgba(255,77,77,0.2)';
+  badge.style.border = '1px solid rgba(255,77,77,0.4)';
+  badge.style.color = 'var(--jackpot)';
+  document.getElementById('modal-primary-btn').style.display = 'block';
+  document.getElementById('result-modal').classList.add('open');
+  confetti(); confetti(); confetti();
+}
+
+function closeModal() { document.getElementById('result-modal').classList.remove('open'); }
+
+// =========== BONUS ===========
+let bonusTimer = null;
+let bonusSeconds = 600;
+
+const BONUS_SEGS = ['75%','50%','25%','FREE','EXTRA'];
+const BONUS_WEIGHTS = [40, 25, 15, 10, 10];
+
+function startBonus(habit) {
+  document.getElementById('result-label').textContent = 'BONUS ⚡';
+  document.getElementById('result-label').style.color = 'var(--gold)';
+  document.getElementById('result-desc').textContent = '¡Rueda bonus activada! Tienes 10 min...';
+  bonusSeconds = 600;
+  document.getElementById('bonus-result').textContent = '';
+  document.getElementById('bonus-spin-btn').style.display = 'none';
+  updateBonusTimer();
+  document.getElementById('bonus-modal').classList.add('open');
+  bonusTimer = setInterval(() => {
+    bonusSeconds--;
+    updateBonusTimer();
+    if (bonusSeconds <= 0) {
+      clearInterval(bonusTimer);
+      document.getElementById('bonus-spin-btn').style.display = 'block';
+      document.getElementById('bonus-result').textContent = '¡Tiempo! Gira para ver tu descuento:';
+    }
+  }, 1000);
+}
+
+function updateBonusTimer() {
+  const m = Math.floor(bonusSeconds/60);
+  const s = bonusSeconds % 60;
+  const el = document.getElementById('bonus-timer');
+  el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  el.className = 'timer-display' + (bonusSeconds <= 30 && bonusSeconds > 0 ? ' urgent' : '');
+  if (bonusSeconds <= 0) { el.textContent = '¡GIRA!'; el.className = 'timer-display'; }
+  // Show spin button after timer started to let user spin early
+  if (bonusSeconds < 600) document.getElementById('bonus-spin-btn').style.display = 'block';
+}
+
+function spinBonusWheel() {
+  clearInterval(bonusTimer);
+  let r = Math.random() * 100;
+  let result = 'FREE';
+  let cum = 0;
+  for (let i=0; i<BONUS_WEIGHTS.length; i++) {
+    cum += BONUS_WEIGHTS[i];
+    if (r < cum) { result = BONUS_SEGS[i]; break; }
+  }
+  const msgs = {
+    '75%': '¡75%! Haz el 75% del hábito → ganas un clip extra',
+    '50%': '¡50%! Haz la mitad → ganas un clip extra',
+    '25%': '¡25%! Solo el 25% → ganas un clip extra',
+    'FREE': '¡FREE! Clip gratis sin hacer nada más 🎁',
+    'EXTRA': '¡EXTRA! Dos rondas más de bonus 🔥',
+  };
+  document.getElementById('bonus-result').textContent = msgs[result];
+  document.getElementById('bonus-spin-btn').style.display = 'none';
+  if (result === 'FREE' || result === 'EXTRA') confetti();
+}
+
+function closeBonusModal() {
+  clearInterval(bonusTimer);
+  document.getElementById('bonus-modal').classList.remove('open');
+}
+
+// =========== HABITS ===========
+function habitDone(habitId) {
+  const h = state.habits[habitId];
+  const today = new Date().toDateString();
+
+  if (h.lastDate === today) {
+    const cont = confirm('Ya registraste este hábito hoy. ¿Hacer otra sesión?');
+    if (!cont) return;
+  } else {
+    const yesterday = new Date(Date.now() - 86400000).toDateString();
+    if (h.lastDate === yesterday) h.streak++;
+    else h.streak = 1;
+    h.lastDate = today;
+  }
+
+  h.clips++;
+  h.total++;
+  state.totalHabits++;
+  state.pendingHabit = habitId;
+
+  const names = { phd:'📚 Proyecto PhD', meditate:'🧘 Meditación', clean:'🏠 Orden en Casa' };
+  document.getElementById('active-habit-label').textContent = `✅ ${names[habitId]} completado`;
+
+  saveState();
+  updateUI();
+  switchTab('wheel');
+}
+
+// =========== UI ===========
+const CLIP_COLORS = ['#ef4444','#f97316','#eab308','#22c55e','#3b82f6','#a855f7'];
+
+function updateUI() {
+  ['phd','meditate','clean'].forEach(id => {
+    const h = state.habits[id];
+    const maxes = { phd:50, meditate:30, clean:20 };
+    const max = maxes[id];
+
+    // streak
+    document.getElementById(`${id}-streak`).textContent = `🔥 ${h.streak} día${h.streak!==1?'s':''} seguido${h.streak!==1?'s':''}`;
+    // jar
+    const pct = Math.min((h.clips / max) * 100, 100);
+    document.getElementById(`${id}-jar`).style.width = pct + '%';
+    document.getElementById(`${id}-clips-label`).textContent = `${h.clips} / ${max}`;
+
+    // clips row (last 6)
+    const row = document.getElementById(`${id}-clips-row`);
+    row.innerHTML = '';
+    const show = Math.min(h.clips, 6);
+    for (let i=0; i<6; i++) {
+      const div = document.createElement('div');
+      div.className = 'clip' + (i < show ? ' filled' : '');
+      if (i < show) {
+        const color = CLIP_COLORS[i % CLIP_COLORS.length];
+        div.style.background = color;
+        div.style.color = color;
+      }
+      row.appendChild(div);
+    }
+  });
+
+  document.getElementById('total-spins').textContent = state.totalSpins;
+  document.getElementById('total-habits').textContent = state.totalHabits;
+  document.getElementById('total-jackpots').textContent = state.totalJackpots;
+  document.getElementById('stat-phd').textContent = state.habits.phd.clips;
+  document.getElementById('stat-med').textContent = state.habits.meditate.clips;
+  document.getElementById('stat-clean').textContent = state.habits.clean.clips;
+}
+
+// =========== TABS ===========
+function switchTab(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  const tabs = ['wheel','habits','rewards','stats'];
+  document.querySelectorAll('.tab')[tabs.indexOf(id)].classList.add('active');
+}
+
+// =========== CONFETTI ===========
+function confetti() {
+  const colors = ['#FFD700','#ff4d4d','#4ade80','#60a5fa','#c084fc','#fb923c'];
+  for (let i=0; i<30; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.left = Math.random()*100 + 'vw';
+    el.style.top = '-10px';
+    el.style.background = colors[Math.floor(Math.random()*colors.length)];
+    el.style.animationDuration = (1.5 + Math.random()*2) + 's';
+    el.style.animationDelay = (Math.random()*0.5) + 's';
+    el.style.transform = `rotate(${Math.random()*360}deg)`;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 4000);
+  }
+}
+
+// =========== RESET ===========
+function resetConfirm() {
+  if (confirm('¿Segura que quieres reiniciar todo? Se perderán tus clips y stats.')) {
+    state = {
+      habits: {
+        phd:      { clips:0, total:0, streak:0, lastDate:null, maxClips:50 },
+        meditate: { clips:0, total:0, streak:0, lastDate:null, maxClips:30 },
+        clean:    { clips:0, total:0, streak:0, lastDate:null, maxClips:20 }
+      },
+      totalSpins:0, totalHabits:0, totalJackpots:0, pendingHabit:null
+    };
+    saveState();
+    updateUI();
+    wheelAngle = 0;
+    drawWheel(0);
+  }
+}
+
+// =========== INIT ===========
+loadState();
+updateUI();
+drawWheel(0);
+</script>
+</body>
+</html>
